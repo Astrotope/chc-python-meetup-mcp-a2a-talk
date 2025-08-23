@@ -1,0 +1,1 @@
+# Chess MCP Server Unit Tests
