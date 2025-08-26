@@ -1,1 +1,0 @@
-# Chess Player Agent Test Scripts

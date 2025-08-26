@@ -47,7 +47,7 @@ cover/
 
 # Environments - CRITICAL: Exclude all .env files containing secrets
 .env
-.env.*
+.env
 .venv
 env/
 venv/
@@ -111,3 +111,6 @@ inspector/a2a-inspector/
 
 # Playwright MCP
 .playwright-mcp/
+
+# Legacy vscode
+legacy/
