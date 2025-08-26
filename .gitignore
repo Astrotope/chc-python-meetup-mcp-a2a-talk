@@ -22,6 +22,9 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# ZED
+.zed/
+
 # PyInstaller
 *.manifest
 *.spec
