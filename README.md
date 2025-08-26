@@ -188,6 +188,124 @@ graph TB
 
 ## 🔧 Development
 
+### Testing Player Agents with curl
+
+You can test the A2A player agents directly using curl. Send chess positions in FEN format to get move responses:
+
+**Test White Player Agent:**
+```bash
+curl -s -X POST http://localhost:8005/ \
+     -H "Content-Type: application/json" \
+     -d '{
+           "jsonrpc": "2.0",
+           "method": "message/send",
+           "id": 1,
+           "params": {
+             "message": {
+               "messageId": "msg-001",
+               "role": "user",
+               "parts": [
+                 {
+                   "text": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                 }
+               ]
+             }
+           }
+         }' | jq '.'
+```
+
+**Test Black Player Agent:**
+```bash
+curl -s -X POST http://localhost:8006/ \
+     -H "Content-Type: application/json" \
+     -d '{
+           "jsonrpc": "2.0",
+           "method": "message/send",
+           "id": 1,
+           "params": {
+             "message": {
+               "messageId": "msg-001", 
+               "role": "user",
+               "parts": [
+                 {
+                   "text": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
+                 }
+               ]
+             }
+           }
+         }' | jq '.'
+```
+
+**Extract Just the Move:**
+```bash
+# Add this filter to get clean move output
+| jq -r '.result.history[] | select(.role == "agent") | .parts[] | select(.kind == "text" and (.metadata.adk_thought | not)) | .text' | tail -1
+```
+
+*Note: The orchestrator agent cannot be tested directly as it requires a browser session through the Gradio interface.*
+
+### ADK Development UI
+
+Use the `adk web` CLI for interactive agent testing with a web interface:
+
+```bash
+# Navigate to the agent directory
+cd adk_chess
+
+# Launch the development UI
+uv run adk web
+
+# Access at: http://127.0.0.1:8000
+```
+
+The ADK web UI provides:
+- **Interactive chat interface** with player agents
+- **Real-time tool execution** visibility (MCP calls)
+- **Session management** and conversation history
+- **Multi-agent selection** from dropdown
+- **Visual debugging** interface
+
+Select player agents (white_player_agent, black_player_agent) from the dropdown and test with FEN positions interactively.
+
+*Note: The orchestrator agent cannot be tested via ADK web as it relies on shared global state (ChessGameManager) with the Gradio interface and connects to remote A2A player agents configured for Docker networking.*
+
+**Example interaction with white player agent:**
+```
+Input: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+
+Thought
+My Strategy for Generating the Best White Move
+
+Okay, here's the game plan. The user has given me a FEN string, and my task is to produce the optimal white move. Being the seasoned professional that I am, I'll approach this methodically. First, I need to ensure the FEN string is legitimate; I'll use validate_fen for that crucial step. Assuming that passes muster, I'll then leverage get_stockfish_move to tap into the engine's power and determine the best possible move. However, I won't blindly trust that result! I'll immediately validate the move itself using validate_move, ensuring it's a legal and sensible action. Finally, and only after all these checks and balances are in place, will I structure the result in the expected JSON format using set_model_response, providing a clean, validated, and optimized response for the user. This ensures I deliver a high-quality move, backed by solid verification and ready for integration.
+
+Thought
+My Analytical Process for the Chess Position
+
+Okay, the FEN string is looking good – it's definitely a valid representation of the chess position. Now, the real work begins. My next step, as always in these analyses, is to leverage the power of get_stockfish_move. I need Stockfish's expert evaluation to pinpoint the objectively best move for White in this specific scenario. I'm relying on Stockfish's deep analysis and the wealth of data it's able to process to guide my strategic thinking. This initial step will give me the crucial foundation for my own, more nuanced, understanding of the position.
+
+My Next Step: Validating the Stockfish Move
+
+Stockfish has delivered its recommendation: "e2e4". While I trust Stockfish's judgment implicitly, my internal process demands a final verification. To ensure absolute accuracy and adherence to chess rules, my immediate next step is to use the validate_move tool. I will provide the original FEN and Stockfish's suggested move ("e2e4") to validate_move. This crucial step confirms that the move is indeed legal within the given board state, guaranteeing that the final output is not only optimal but also perfectly permissible under the laws of chess. This methodical approach is key to delivering a consistently reliable and error-free response.
+
+Thought
+My Strategic Evaluation of Stockfish's Move
+
+Okay, so Stockfish is suggesting "e2e4." That's a classic opening, but before I automatically endorse it, I need to rigorously vet it. My immediate thought is to use validate_move to confirm its legality within the current board state. I can't just blindly accept the engine's suggestion, even though Stockfish is incredibly strong. The potential consequences of an illegal move are too great, it could crash the program, or lead to an incorrect analysis. This validation step is fundamental to ensuring the integrity of the analysis and ensuring that I am working with a reliable starting point. After validate_move confirms its legality, only then can I confidently integrate this move into my model response.
+
+Finalizing the Response with a Validated Move
+
+The final validation step is complete, and "e2e4" has been confirmed as a perfectly legal move for the given FEN. All the checks are in place. My internal process has verified the FEN, retrieved an optimal move from Stockfish, and rigorously validated that move. I can now confidently and definitively set the model's response. The set_model_response tool is the final action, delivering the validated move in the required JSON format. This structured output is critical for downstream systems, and this step ensures that the entire analytical pipeline, from initial FEN validation to final move confirmation, has been executed flawlessly.
+
+Thought
+Validating and Responding to the Move
+
+Okay, "e2e4" is confirmed. That's good, it's a solid opening. Now that I have the validated move, I need to integrate it into my response. I'll set the model output to reflect this move, ensuring it's clearly communicated. This is the stage where I transition from the analysis of potential moves to actually playing the first move in the game, in this instance "e2e4".
+
+{"move": "e2e4"}
+```
+
+The agent shows its complete thinking process including strategic planning, FEN validation, Stockfish consultation, move validation, and structured JSON response generation.
+
 ### Individual Service Testing
 
 Test individual containers before full compose:
