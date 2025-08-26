@@ -2,6 +2,10 @@
 
 A containerized chess system demonstrating Google's Agent Development Kit (ADK) with Agent-to-Agent (A2A) protocol communication and Model Context Protocol (MCP) integration.
 
+## 🖥️ Gradio GUI Frontend
+
+<img width="1494" height="1016" alt="image" src="https://github.com/user-attachments/assets/649170c8-d86e-45da-b8e1-a2bef390ddf8" />
+
 ## 🏗️ Architecture Overview
 
 ```mermaid
