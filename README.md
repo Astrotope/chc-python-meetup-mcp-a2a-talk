@@ -2,9 +2,49 @@
 
 A containerized chess system demonstrating Google's Agent Development Kit (ADK) with Agent-to-Agent (A2A) protocol communication and Model Context Protocol (MCP) integration.
 
+## 📋 Table of Contents
+
+- [🖥️ Gradio GUI Frontend](#%EF%B8%8F-gradio-gui-frontend)
+- [🏗️ Architecture Overview](#%EF%B8%8F-architecture-overview)
+- [📁 Project Structure](#-project-structure)
+- [🧩 Component Details](#-component-details)
+  - [1. MCP Chess Server](#1-mcp-chess-server-chess-mcp-server)
+  - [2. White Player Agent](#2-white-player-agent-adk_chesswhite_player_agent)
+  - [3. Black Player Agent](#3-black-player-agent-adk_chessblack_player_agent)
+  - [4. Chess UI & Orchestrator](#4-chess-ui--orchestrator-adk_chess)
+  - [5. A2A Inspector](#5-a2a-inspector-debugging-tool)
+  - [6. MCP Inspector](#6-mcp-inspector-debugging-tool)
+- [🚀 Getting Started](#-getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Setup Instructions](#setup-instructions)
+  - [Service URLs](#service-urls)
+- [🔧 Development](#-development)
+  - [Testing Player Agents with curl](#testing-player-agents-with-curl)
+  - [ADK Development UI](#adk-development-ui)
+  - [MCP Inspector Usage](#mcp-inspector-usage)
+  - [A2A Inspector Usage](#a2a-inspector-usage)
+  - [Individual Service Testing](#individual-service-testing)
+  - [Service Dependencies](#service-dependencies)
+- [🏛️ Technical Architecture](#%EF%B8%8F-technical-architecture)
+  - [A2A Protocol Communication](#a2a-protocol-communication)
+  - [MCP Integration](#mcp-integration)
+  - [Environment Configuration](#environment-configuration)
+- [📊 Agent Observability with AgentOps](#-agent-observability-with-agentops)
+  - [Enabling/Disabling AgentOps](#enablingdisabling-agentops)
+  - [What AgentOps Captures](#what-agentops-captures)
+  - [Viewing Agent Performance](#viewing-agent-performance)
+  - [Key Metrics Available](#key-metrics-available)
+- [🐛 Troubleshooting](#-troubleshooting)
+  - [Common Issues](#common-issues)
+  - [Logs](#logs)
+- [🎯 Features Demonstrated](#-features-demonstrated)
+- [📚 Technologies Used](#-technologies-used)
+
 ## 🖥️ Gradio GUI Frontend
 
 <img width="1494" height="1016" alt="image" src="https://github.com/user-attachments/assets/649170c8-d86e-45da-b8e1-a2bef390ddf8" />
+
+[TOC](#-table-of-contents)
 
 ## 🏗️ Architecture Overview
 
@@ -51,6 +91,8 @@ graph TB
     class A2A_INSPECTOR,MCP_INSPECTOR debug
 ```
 
+[TOC](#-table-of-contents)
+
 ## 📁 Project Structure
 
 ```
@@ -79,6 +121,8 @@ graph TB
     ├── uv.lock                        # Dependency lockfile
     └── chess_mcp_server.py            # FastMCP server with Stockfish
 ```
+
+[TOC](#-table-of-contents)
 
 ## 🧩 Component Details
 
@@ -135,6 +179,8 @@ graph TB
   - Real-time protocol monitoring
   - Connect to chess MCP server at `http://chess-mcp-server:5000/mcp` with `streamable-http` transport
 
+[TOC](#-table-of-contents)
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -185,6 +231,8 @@ graph TB
 - **A2A Inspector**: http://localhost:8080 (debug A2A protocol communication)
 - **MCP Inspector**: http://localhost:6274 (debug MCP server interactions)
 - **AgentOps Dashboard**: https://app.agentops.ai (view agent traces and performance metrics)
+
+[TOC](#-table-of-contents)
 
 ## 🔧 Development
 
@@ -457,6 +505,8 @@ Services start in this order:
 
 Health checks ensure proper startup sequencing.
 
+[TOC](#-table-of-contents)
+
 ## 🏛️ Technical Architecture
 
 ### A2A Protocol Communication
@@ -474,6 +524,8 @@ Health checks ensure proper startup sequencing.
 - `env_file`: Base configuration from `.env`
 - `environment`: Docker Compose service-specific overrides
 - Precedence: Docker environment > env_file > Dockerfile
+
+[TOC](#-table-of-contents)
 
 ## 📊 Agent Observability with AgentOps
 
@@ -512,6 +564,8 @@ When enabled, you'll see startup messages: `🔍 AgentOps observability enabled 
 - **Success Rates**: Move validation and game completion statistics
 - **Error Tracking**: Failed moves, communication errors, and recovery patterns
 
+[TOC](#-table-of-contents)
+
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -547,6 +601,8 @@ docker compose logs -f chess-ui
 docker compose logs --tail=50
 ```
 
+[TOC](#-table-of-contents)
+
 ## 🎯 Features Demonstrated
 
 - **Multi-Agent Architecture**: Orchestrator coordinating specialized agents
@@ -559,6 +615,8 @@ docker compose logs --tail=50
 - **Agent Observability**: AgentOps integration for session replays, metrics, and performance monitoring
 - **Protocol Debugging**: A2A Inspector for agent communication debugging
 - **MCP Server Testing**: MCP Inspector for interactive server testing and tool discovery
+
+[TOC](#-table-of-contents)
 
 ## 📚 Technologies Used
 
