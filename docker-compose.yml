@@ -1,0 +1,156 @@
+version: '3.8'
+
+services:
+  # MCP Chess Server - Foundation service
+  chess-mcp-server:
+    build:
+      context: ./chess-mcp-server
+      dockerfile: Dockerfile
+    ports:
+      - "8010:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - chess-network
+
+  # White Player Agent - Depends on MCP Server
+  white-player-agent:
+    build:
+      context: ./adk_chess
+      dockerfile: white_player_agent/Dockerfile
+    ports:
+      - "8005:8005"
+    env_file:
+      - ./adk_chess/.env
+    environment:
+      # Service-specific overrides for Docker Compose networking
+      - MCP_SERVER_URL=http://chess-mcp-server:5000/mcp
+      - WHITE_PLAYER_PORT=8005
+      - WHITE_PLAYER_HOST=white-player-agent
+      - WHITE_PLAYER_URL=http://white-player-agent:8005
+    depends_on:
+      chess-mcp-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/.well-known/agent-card.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - chess-network
+
+  # Black Player Agent - Depends on MCP Server
+  black-player-agent:
+    build:
+      context: ./adk_chess
+      dockerfile: black_player_agent/Dockerfile
+    ports:
+      - "8006:8006"
+    env_file:
+      - ./adk_chess/.env
+    environment:
+      # Service-specific overrides for Docker Compose networking
+      - MCP_SERVER_URL=http://chess-mcp-server:5000/mcp
+      - BLACK_PLAYER_PORT=8006
+      - BLACK_PLAYER_HOST=black-player-agent
+      - BLACK_PLAYER_URL=http://black-player-agent:8006
+    depends_on:
+      chess-mcp-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/.well-known/agent-card.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - chess-network
+
+  # A2A Inspector - Debugging tool for A2A protocol servers
+  a2a-inspector:
+    build:
+      context: https://github.com/a2aproject/a2a-inspector.git
+    ports:
+      - "8080:8080"
+    depends_on:
+      white-player-agent:
+        condition: service_healthy
+      black-player-agent:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - chess-network
+
+  # MCP Inspector - Debugging tool for MCP servers
+  mcp-inspector:
+    build:
+      context: https://github.com/modelcontextprotocol/inspector.git
+    ports:
+      - "6274:6274"  # Client UI port
+      - "6277:6277"  # Server proxy port
+    environment:
+      - CLIENT_PORT=6274
+      - SERVER_PORT=6277
+      # Bind to all interfaces for container access
+      - HOST=0.0.0.0
+      # Disable automatic browser opening in container
+      - NO_OPEN=true
+      # Disable DNS rebinding protection for development
+      - DANGEROUSLY_OMIT_AUTH=true
+      - DANGEROUSLY_ALLOW_ALL_ORIGINS=true
+    depends_on:
+      chess-mcp-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:6274"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - chess-network
+
+  # Gradio Chess UI - Depends on both player agents
+  chess-ui:
+    build:
+      context: ./adk_chess
+      dockerfile: Dockerfile
+    ports:
+      - "7865:7865"
+    env_file:
+      - ./adk_chess/.env
+    environment:
+      # Service-specific overrides for Docker Compose networking
+      - WHITE_PLAYER_URL=http://white-player-agent:8005
+      - BLACK_PLAYER_URL=http://black-player-agent:8006
+      - MCP_SERVER_URL=http://chess-mcp-server:5000/mcp
+    depends_on:
+      white-player-agent:
+        condition: service_healthy
+      black-player-agent:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7865"]
+      interval: 45s
+      timeout: 15s
+      retries: 5
+      start_period: 90s
+    networks:
+      - chess-network
+
+networks:
+  chess-network:
+    driver: bridge
+
+volumes:
+  chess-data:
