@@ -1,1 +1,0 @@
-# Chess MCP Server Integration Tests
