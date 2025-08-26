@@ -306,6 +306,123 @@ Okay, "e2e4" is confirmed. That's good, it's a solid opening. Now that I have th
 
 The agent shows its complete thinking process including strategic planning, FEN validation, Stockfish consultation, move validation, and structured JSON response generation.
 
+### MCP Inspector Usage
+
+Use the MCP Inspector to test and debug MCP server interactions:
+
+1. **Access MCP Inspector**: http://localhost:6274
+2. **Configure Connection**:
+   - **Transport Type**: `Streamable HTTP`
+   - **URL**: `http://chess-mcp-server:5000/mcp`
+3. **Test Tools**:
+   - Navigate to **Tools Tab**
+   - Click **List Tools** to discover available tools
+   - Select **get_stockfish_move** tool
+   - Enter parameter: `fen` = `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1`
+   - Click **Run Tool** button to see resulting output
+
+**Example MCP Result JSON:**
+```json
+{
+  "success": true,
+  "move_uci": "e2e4",
+  "error": null
+}
+```
+
+The MCP Inspector provides direct access to chess engine functionality and real-time protocol monitoring.
+
+### A2A Inspector Usage
+
+Use the A2A Inspector to test and debug A2A agent communication:
+
+1. **Access A2A Inspector**: http://localhost:8080
+2. **Connect to Agent**:
+   - Enter agent URL in top box: `http://white-player-agent:8005`
+   - Click **Connect**
+   - View the dynamically generated **Agent Card**
+3. **Test Agent Communication**:
+   - Enter FEN in message box: `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1`
+   - Click **Send**
+   - Wait for processing
+   - Click the **task Task created with status: completed ✅** message to see resulting JSON
+
+**Example A2A Response:**
+```json
+{
+  "artifacts": [
+    {
+      "artifactId": "11b740b2-c3a5-488c-8827-1c4f77f858e7",
+      "parts": [
+        {
+          "kind": "text",
+          "text": "{\"move\": \"e2e4\"}"
+        }
+      ]
+    }
+  ],
+  "contextId": "0b3040f8-6f08-48b0-8a09-2fe5199a2aa1",
+  "history": [
+    {
+      "contextId": "0b3040f8-6f08-48b0-8a09-2fe5199a2aa1",
+      "kind": "message",
+      "messageId": "msg-1756179429989-mcozpu6ym",
+      "metadata": {},
+      "parts": [
+        {
+          "kind": "text",
+          "text": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        }
+      ],
+      "role": "user",
+      "taskId": "cf0184a9-db75-4e97-841f-e2aeb4b4078a"
+    },
+    
+    ...
+    
+    {
+      "kind": "message",
+      "messageId": "282939c1-0977-4fd4-b16f-92fe9b7342ed",
+      "parts": [
+        {
+          "kind": "text",
+          "text": "{\"move\": \"e2e4\"}"
+        }
+      ],
+      "role": "agent"
+    }
+  ],
+  "id": "cf0184a9-db75-4e97-841f-e2aeb4b4078a",
+  "kind": "task",
+  "metadata": {
+    "adk_app_name": "white_chess_player_agent",
+    "adk_user_id": "A2A_USER_0b3040f8-6f08-48b0-8a09-2fe5199a2aa1",
+    "adk_session_id": "0b3040f8-6f08-48b0-8a09-2fe5199a2aa1",
+    "adk_invocation_id": "",
+    "adk_author": "white_chess_player_agent",
+    "adk_usage_metadata": {
+      "candidatesTokenCount": 151,
+      "promptTokenCount": 1588,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 1588
+        }
+      ],
+      "thoughtsTokenCount": 25,
+      "totalTokenCount": 1764
+    }
+  },
+  "status": {
+    "state": "completed",
+    "timestamp": "2025-08-26T03:37:25.860102+00:00"
+  },
+  "validation_errors": []
+}
+```
+
+The A2A Inspector shows the complete task execution including agent thinking process, tool usage, and final JSON response.
+
 ### Individual Service Testing
 
 Test individual containers before full compose:
